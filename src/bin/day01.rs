@@ -16,7 +16,6 @@ fn main() {
     let _ = data
         .lines()
         .map(|s| {
-            // println!("{s}");
             let Some(parts) = re.captures(s) else {
                 panic!("aaaaaah");
             };
@@ -31,9 +30,6 @@ fn main() {
     left.sort();
     right.sort();
 
-    // println!("{:?}", left);
-    // println!("{:?}", right);
-
     assert!(left.len() == right.len());
     let mut right_iter = right.iter();
 
@@ -46,7 +42,6 @@ fn main() {
     let mut found = std::collections::HashMap::<i32, i32>::new();
     let leftover = right.iter();
 
-    // if in hashmap, add corresponding value, if not, iterate over left-over list
     let similarity: i32 = left
         .iter()
         .map(|x| match found.get(&x) {
