@@ -1,4 +1,3 @@
-use regex;
 use std::fs;
 
 fn main() {
@@ -11,19 +10,12 @@ fn main() {
     let mut left: Vec<i32> = Vec::new();
     let mut right: Vec<i32> = Vec::new();
 
-    let re = regex::Regex::new(r"(?<left>[0-9]+)\s+(?<right>[0-9]+)").unwrap();
-
     let _ = data
         .lines()
         .map(|s| {
-            let Some(parts) = re.captures(s) else {
-                panic!("aaaaaah");
-            };
-            let left_num = &parts["left"];
-            let right_num = &parts["right"];
-
-            left.push(left_num.parse::<i32>().unwrap());
-            right.push(right_num.parse::<i32>().unwrap());
+            let mut itr = s.split_whitespace();
+            left.push(itr.next().unwrap().parse().unwrap());
+            right.push(itr.next().unwrap().parse().unwrap());
         })
         .count();
 
