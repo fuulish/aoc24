@@ -30,6 +30,7 @@ fn main() {
         .map(|x| (x - right_iter.next().unwrap()).abs())
         .sum();
     println!("total: {total}");
+    assert!(total == 1189304);
 
     let mut found = std::collections::HashMap::<i32, i32>::new();
     let leftover = right.iter();
@@ -49,4 +50,5 @@ fn main() {
         .sum();
 
     println!("similarity: {similarity}");
+    assert!(similarity == 24349736);
 }
