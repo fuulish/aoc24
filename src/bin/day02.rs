@@ -1,5 +1,25 @@
 use std::fs;
 
+fn evalute_safety(stages: &Vec<i32>) -> bool {
+    let desc: Vec<_> = stages
+        .iter()
+        .zip(stages.iter().skip(1))
+        .map(|(a, b)| b - a)
+        .collect();
+
+    let nsign: i32 = desc.iter().map(|v| v.signum()).sum();
+    let monotonuous = nsign.abs() as usize == desc.len();
+
+    let num_steps = desc.len();
+    let desc: Vec<i32> = desc
+        .iter()
+        .map(|&v| v.abs())
+        .filter(|&v| v >= 1 && v <= 3)
+        .collect();
+
+    monotonuous && num_steps == desc.len()
+}
+
 fn main() {
     println!("Day 2");
     let mut args = std::env::args();
@@ -16,23 +36,7 @@ fn main() {
                 .map(|v| v.parse::<i32>().unwrap())
                 .collect();
 
-            let desc: Vec<_> = itr
-                .iter()
-                .zip(itr.iter().skip(1))
-                .map(|(a, b)| b - a)
-                .collect();
-
-            let nsign: i32 = desc.iter().map(|v| v.signum()).sum();
-            let monotonuous = nsign.abs() as usize == desc.len();
-
-            let num_steps = desc.len();
-            let desc: Vec<i32> = desc
-                .iter()
-                .map(|&v| v.abs())
-                .filter(|&v| v >= 1 && v <= 3)
-                .collect();
-
-            monotonuous && num_steps == desc.len()
+            evalute_safety(&itr)
         })
         .count();
 
