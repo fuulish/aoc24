@@ -11,9 +11,17 @@ fn main() {
         .lines()
         .filter(|s| {
             // XXX: could collect here, but that means having to create a new iterator later on
-            let itr = s.split_whitespace().map(|v| v.parse::<i32>().unwrap());
+            let itr: Vec<i32> = s
+                .split_whitespace()
+                .map(|v| v.parse::<i32>().unwrap())
+                .collect();
 
-            let desc: Vec<_> = itr.clone().zip(itr.skip(1)).map(|(a, b)| b - a).collect();
+            let desc: Vec<_> = itr
+                .clone()
+                .iter()
+                .zip(itr.clone().iter().skip(1))
+                .map(|(a, b)| b - a)
+                .collect();
 
             let nsign: i32 = desc.iter().map(|v| v.signum()).sum();
             let monotonuous = nsign.abs() as usize == desc.len();
