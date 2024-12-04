@@ -17,9 +17,8 @@ fn main() {
                 .collect();
 
             let desc: Vec<_> = itr
-                .clone()
                 .iter()
-                .zip(itr.clone().iter().skip(1))
+                .zip(itr.iter().skip(1))
                 .map(|(a, b)| b - a)
                 .collect();
 
