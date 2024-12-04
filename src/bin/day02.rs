@@ -36,10 +36,22 @@ fn main() {
                 .map(|v| v.parse::<i32>().unwrap())
                 .collect();
 
-            evalute_safety(&itr)
+            if evalute_safety(&itr) {
+                return true;
+            } else {
+                for (i, _) in itr.iter().enumerate() {
+                    let mut cl = itr.clone();
+                    cl.remove(i);
+                    if evalute_safety(&cl) {
+                        return true;
+                    }
+                }
+            }
+            false
         })
         .count();
 
     println!("{safe} safe");
-    assert!(safe == 631);
+    // assert!(safe == 631); // part 1
+    assert!(safe == 665); // part 2
 }
