@@ -9,31 +9,26 @@ fn main() {
 
     let safe = data
         .lines()
-        .map(|s| {
-            let itr = s.split_whitespace();
+        .filter(|s| {
+            // XXX: could collect here, but that means having to create a new iterator later on
+            let itr = s.split_whitespace().map(|v| v.parse::<i32>().unwrap());
 
-            let desc: Vec<_> = itr
-                .clone()
-                .zip(itr.skip(1))
-                .map(|(a, b)| a.parse::<i32>().unwrap() - b.parse::<i32>().unwrap())
-                .collect();
+            let desc: Vec<_> = itr.clone().zip(itr.skip(1)).map(|(a, b)| b - a).collect();
 
             let nsign: i32 = desc.iter().map(|v| v.signum()).sum();
-            println!("{nsign}");
             let monotonuous = nsign.abs() as usize == desc.len();
 
-            println!("{monotonuous}");
-            println!("{:?}", desc);
-            monotonuous
-                && (desc
-                    .iter()
-                    .map(|&v| v.abs())
-                    .filter(|&v| v >= 1 && v <= 3)
-                    .count()
-                    == desc.len())
+            let num_steps = desc.len();
+            let desc: Vec<i32> = desc
+                .iter()
+                .map(|&v| v.abs())
+                .filter(|&v| v >= 1 && v <= 3)
+                .collect();
+
+            monotonuous && num_steps == desc.len()
         })
         .count();
 
     println!("{safe} safe");
-    assert!(safe == 2);
+    assert!(safe == 631);
 }
