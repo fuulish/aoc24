@@ -7,7 +7,7 @@ fn into_vertical_lines(inp: &str) -> String {
 }
 
 fn part1(inp: &str) -> usize {
-    let find_nxmas = {
+    let count_xmas = {
         |line: &str| {
             let mut start: usize = 0;
             let mut count: usize = 0;
@@ -19,12 +19,12 @@ fn part1(inp: &str) -> usize {
         }
     };
 
-    let mut total = inp.lines().map(|line| find_nxmas(line)).sum();
+    let mut total = inp.lines().map(|line| count_xmas(line)).sum();
     total += inp
         .lines()
         // XXX: potentially extract into sub-function
         .map(|line| line.chars().rev().collect::<String>())
-        .map(|rev| find_nxmas(&rev))
+        .map(|rev| count_xmas(&rev))
         .sum::<usize>();
 
     // there's a number of ways to flatten the array
