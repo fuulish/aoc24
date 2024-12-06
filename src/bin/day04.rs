@@ -20,12 +20,30 @@ fn into_left_diagonal_lines(inp: &str) -> String {
         diag.push('\n');
     }
 
-    println!("{diag}");
     diag
 }
 
 fn into_right_diagonal_lines(inp: &str) -> String {
-    String::new()
+    let mut diag = String::new();
+    let lines: Vec<&str> = inp.lines().collect();
+    let dim = lines.len();
+
+    for i in 0..dim {
+        for j in 0..i + 1 {
+            // this is the upper half triangle
+            diag.push(lines[j].as_bytes()[dim - 1 + j - i] as char);
+        }
+        diag.push('\n');
+    }
+    // full diagonal already covered in the above
+    for i in 1..dim {
+        for j in 0..dim - i {
+            diag.push(lines[i + j].as_bytes()[j] as char)
+        }
+        diag.push('\n');
+    }
+
+    diag
 }
 
 fn into_vertical_lines(inp: &str) -> String {
@@ -40,7 +58,6 @@ fn into_vertical_lines(inp: &str) -> String {
         verti.push('\n');
     }
 
-    println!("{verti}");
     verti
 }
 
@@ -61,6 +78,7 @@ fn count_xmas(inp: &str) -> usize {
     total += inp
         .lines()
         // XXX: potentially extract into sub-function
+        // XXX: or just search for the reverse string... "SAMX"
         .map(|line| line.chars().rev().collect::<String>())
         .map(|rev| xmas_per_string(&rev))
         .sum::<usize>();
@@ -99,5 +117,5 @@ fn main() {
     let total_p1 = part1(&data);
     println!("{total_p1}");
     // let total_p2 = part2(&data);
-    assert!(total_p1 == 18); // real input part 1
+    assert!(total_p1 == 2378); // real input part 1
 }
