@@ -103,8 +103,44 @@ fn part1(inp: &str) -> usize {
     total
 }
 
-fn part2(inp: &str) -> i32 {
-    0
+fn part2(inp: &str) -> usize {
+    let mut total: usize = 0;
+
+    let lines: Vec<&str> = inp.lines().collect();
+    let dim = lines.len();
+
+    for i in 0..dim - 2 {
+        for j in 0..dim - 2 {
+            let first = &lines[i].to_owned()[j..dim];
+            let secnd = &lines[i + 1].to_owned()[j..dim];
+            let third = &lines[i + 2].to_owned()[j..dim];
+
+            let mut mas1 = String::new();
+            mas1.push(first.as_bytes()[0] as char);
+            mas1.push(secnd.as_bytes()[1] as char);
+            mas1.push(third.as_bytes()[2] as char);
+
+            let mut mas2 = String::new();
+            mas2.push(first.as_bytes()[2] as char);
+            mas2.push(secnd.as_bytes()[1] as char);
+            mas2.push(third.as_bytes()[0] as char);
+
+            total += match (
+                mas1.find("MAS"),
+                mas1.find("SAM"),
+                mas2.find("MAS"),
+                mas2.find("SAM"),
+            ) {
+                (Some(_), None, Some(_), None) => 1,
+                (None, Some(_), Some(_), None) => 1,
+                (Some(_), None, None, Some(_)) => 1,
+                (None, Some(_), None, Some(_)) => 1,
+                _ => 0,
+            };
+        }
+    }
+
+    total
 }
 
 fn main() {
@@ -118,4 +154,8 @@ fn main() {
     println!("{total_p1}");
     // let total_p2 = part2(&data);
     assert!(total_p1 == 2378); // real input part 1
+
+    let total_p2 = part2(&data);
+    println!("{total_p2}");
+    assert!(total_p2 == 1796);
 }
