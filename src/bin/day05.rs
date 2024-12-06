@@ -14,7 +14,7 @@ fn part1(pages: &Vec<String>, rules: &Vec<(i32, i32)>) -> i32 {
                 incorrect = true;
             }
         }
-        if (!incorrect) {
+        if !incorrect {
             correct_pages.push(page.to_owned())
         }
     }
