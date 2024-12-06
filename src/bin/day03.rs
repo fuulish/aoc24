@@ -19,11 +19,9 @@ fn part2(inp: &str) -> i32 {
 
     let mut total = 0;
     for c in re.captures_iter(&dat) {
-        match c.get(1) {
-            Some(v) => {
-                total += part1(v.as_str());
-            }
-            None => (),
+        total += match c.get(1) {
+            Some(v) => part1(v.as_str()),
+            None => 0,
         }
     }
     total
