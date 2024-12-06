@@ -15,7 +15,7 @@ fn part1(inp: &str) -> i32 {
 
 fn part2(inp: &str) -> i32 {
     let dat = "do()".to_owned() + inp + "don't()";
-    let re = regex::Regex::new(r"(do\(\)((?s).*?)don't\(\))").unwrap();
+    let re = regex::Regex::new(r"(do\(\)(?s:.*?)don't\(\))").unwrap();
 
     let mut total = 0;
     for c in re.captures_iter(&dat) {
