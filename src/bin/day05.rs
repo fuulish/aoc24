@@ -23,7 +23,7 @@ fn part1(pages: &Vec<String>, rules: &Vec<(i32, i32)>) -> i32 {
     for page in correct_pages {
         let num: Vec<i32> = page.split(",").map(|v| v.parse::<i32>().unwrap()).collect();
 
-        println!("{:?} {}", num, num[num.len() / 2]);
+        // println!("{:?} {}", num, num[num.len() / 2]);
 
         total += num[num.len() / 2];
     }
@@ -68,8 +68,8 @@ fn main() {
 
     let (rules, pages) = extract_input(&data);
 
-    println!("{:?}", rules);
-    println!("{:?}", pages);
+    // println!("{:?}", rules);
+    // println!("{:?}", pages);
 
     let total_p1 = part1(&pages, &rules);
     println!("{total_p1}");
