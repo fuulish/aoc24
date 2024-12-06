@@ -1,7 +1,27 @@
 use std::fs;
 
 fn into_left_diagonal_lines(inp: &str) -> String {
-    String::new()
+    let mut diag = String::new();
+    let lines: Vec<&str> = inp.lines().collect();
+    let dim = lines.len();
+
+    for i in 0..dim {
+        for j in 0..i + 1 {
+            // this is the upper half triangle
+            diag.push(lines[i - j].as_bytes()[j] as char);
+        }
+        diag.push('\n');
+    }
+    // full diagonal already covered in the above
+    for i in 1..dim {
+        for j in 0..dim - i {
+            diag.push(lines[dim - 1 - j].as_bytes()[j + i] as char)
+        }
+        diag.push('\n');
+    }
+
+    println!("{diag}");
+    diag
 }
 
 fn into_right_diagonal_lines(inp: &str) -> String {
