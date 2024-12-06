@@ -4,28 +4,24 @@ use std::fs;
 fn part1(inp: &str) -> i32 {
     let re = Regex::new(r"(mul\(([0-9]+),([0-9]+)\))").unwrap();
 
-    let mut total = 0;
-    for c in re.captures_iter(inp) {
-        let a: i32 = c.get(2).unwrap().as_str().parse().unwrap();
-        let b: i32 = c.get(3).unwrap().as_str().parse().unwrap();
-        total += a * b;
-    }
-
-    total
+    re.captures_iter(inp)
+        .map(|cap| {
+            cap.get(2).unwrap().as_str().parse::<i32>().unwrap()
+                * cap.get(3).unwrap().as_str().parse::<i32>().unwrap()
+        })
+        .sum()
 }
 
 fn part2(inp: &str) -> i32 {
     let dat = "do()".to_owned() + inp + "don't()";
     let re = Regex::new(r"(do\(\)(?s:.*?)don't\(\))").unwrap();
 
-    let mut total = 0;
-    for c in re.captures_iter(&dat) {
-        total += match c.get(1) {
+    re.captures_iter(&dat)
+        .map(|cap| match cap.get(1) {
             Some(v) => part1(v.as_str()),
             None => 0,
-        }
-    }
-    total
+        })
+        .sum()
 }
 
 fn main() {
