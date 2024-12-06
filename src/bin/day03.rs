@@ -1,7 +1,8 @@
+use regex::Regex;
 use std::fs;
 
 fn part1(inp: &str) -> i32 {
-    let re = regex::Regex::new(r"(mul\(([0-9]+),([0-9]+)\))").unwrap();
+    let re = Regex::new(r"(mul\(([0-9]+),([0-9]+)\))").unwrap();
 
     let mut total = 0;
     for c in re.captures_iter(inp) {
@@ -15,7 +16,7 @@ fn part1(inp: &str) -> i32 {
 
 fn part2(inp: &str) -> i32 {
     let dat = "do()".to_owned() + inp + "don't()";
-    let re = regex::Regex::new(r"(do\(\)(?s:.*?)don't\(\))").unwrap();
+    let re = Regex::new(r"(do\(\)(?s:.*?)don't\(\))").unwrap();
 
     let mut total = 0;
     for c in re.captures_iter(&dat) {
