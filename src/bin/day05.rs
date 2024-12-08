@@ -82,11 +82,11 @@ fn part2(rules: &RuleSet, pages: &Vec<Vec<i32>>) -> i32 {
 
     for page in incorrect_pages {
         let mut count = Vec::new();
-        for &left in &page {
+        for &right in &page {
             let idx = count.len();
-            count.push((left, 0));
-            for &right in &page {
-                if *rules.get(&(right, left)).unwrap_or(&false) {
+            count.push((right, 0));
+            for &left in &page {
+                if *rules.get(&(left, right)).unwrap_or(&false) {
                     count[idx].1 += 1;
                 }
             }
