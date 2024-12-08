@@ -1,7 +1,7 @@
 use std::{collections::HashMap, fs};
 
 const TEST_SOLUTION_PART1: i32 = 41;
-const TEST_SOLUTION_PART2: i32 = 0;
+const TEST_SOLUTION_PART2: i32 = 6;
 
 const KNOWN_SOLUTION_PART1: i32 = 5312;
 const KNOWN_SOLUTION_PART2: i32 = 0;
