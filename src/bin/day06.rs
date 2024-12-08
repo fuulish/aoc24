@@ -1,4 +1,4 @@
-use std::{collections::HashMap, collections::HashSet, fs};
+use std::{collections::HashSet, fs};
 
 const TEST_SOLUTION_PART1: i32 = 41;
 const TEST_SOLUTION_PART2: i32 = 6;
@@ -104,11 +104,9 @@ fn part2(map: &Map, starting_pos: &Pos, visited: &HashSet<(Direction, i32, i32)>
         wo_dir.insert((v.1, v.2));
     }
     wo_dir.remove(starting_pos);
-    // brute forcing it the stupid way (and apparently wrong)
     for (x, y) in &wo_dir {
         let mut blocked = map.clone();
         blocked[*y as usize][*x as usize] = true;
-        // match sim_guard(blocked, *starting_pos) {
         match find_path(&blocked, starting_pos).0 {
             Trip::Loops => loops += 1,
             Trip::Exits => (),
@@ -126,7 +124,6 @@ fn extract_input(data: &str) -> (Map, Pos) {
     let mut pos = (0, 0);
     for (i, line) in data.lines().enumerate() {
         let horizontal: Vec<bool> = line.chars().into_iter().map(|c| c == '#').collect();
-        // println!("{:?}", horizontal);
         map.push(horizontal);
 
         if let Some(p) = line.chars().into_iter().position(|p| p == '^') {
