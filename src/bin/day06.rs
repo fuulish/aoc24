@@ -4,7 +4,7 @@ const TEST_SOLUTION_PART1: i32 = 41;
 const TEST_SOLUTION_PART2: i32 = 6;
 
 const KNOWN_SOLUTION_PART1: i32 = 5312;
-const KNOWN_SOLUTION_PART2: i32 = 0;
+const KNOWN_SOLUTION_PART2: i32 = 1748;
 
 #[derive(Copy, Clone, Eq, Hash, PartialEq)]
 enum Direction {
@@ -14,60 +14,15 @@ enum Direction {
     Right,
 }
 
-fn part1(map: &Map, starting_pos: &Pos) -> (HashMap<(i32, i32), i32>, i32) {
-    let mut visited: HashMap<(i32, i32), i32> = HashMap::new();
-    let mut direction = Direction::Up;
-    let xdim = map[0].len() as i32;
-    let ydim = map.len() as i32;
+fn part1(map: &Map, starting_pos: &Pos) -> (HashSet<(Direction, i32, i32)>, i32) {
+    let (_, visited) = find_path(map, starting_pos);
 
-    let mut pos = *starting_pos;
-
-    loop {
-        // println!("current position: {:?}", pos);
-        // XXX: there must be an easier way of doing this...
-        match visited.get_mut(&(pos.0, pos.1)) {
-            Some(v) => {
-                *v += 1;
-            }
-            None => {
-                visited.insert((pos.0, pos.1), 1);
-                ()
-            }
-        }
-
-        let mut next = match direction {
-            Direction::Up => (pos.0, pos.1 - 1) as Pos,
-            Direction::Down => (pos.0, pos.1 + 1) as Pos,
-            Direction::Left => (pos.0 - 1, pos.1) as Pos,
-            Direction::Right => (pos.0 + 1, pos.1) as Pos,
-        };
-
-        if next.0 < 0 || next.0 >= xdim || next.1 < 0 || next.1 >= ydim {
-            break;
-        }
-
-        // println!("{}", map[next.1 as usize][next.0 as usize]);
-        // println!("{:?} {} {}", map, next.1, next.0);
-        (direction, next) = if map[next.1 as usize][next.0 as usize] {
-            match direction {
-                Direction::Up => (Direction::Right, (pos.0 + 1, pos.1) as Pos),
-                Direction::Down => (Direction::Left, (pos.0 - 1, pos.1) as Pos),
-                Direction::Left => (Direction::Up, (pos.0, pos.1 - 1) as Pos),
-                Direction::Right => (Direction::Down, (pos.0, pos.1 + 1) as Pos),
-            }
-        } else {
-            (direction, next)
-        };
-
-        if next.0 < 0 || next.0 >= xdim || next.1 < 0 || next.1 >= ydim {
-            break;
-        }
-
-        pos = next;
+    let mut wo_dir = HashSet::new();
+    for v in visited.iter() {
+        wo_dir.insert((v.1, v.2));
     }
+    let ntot = wo_dir.len() as i32;
 
-    // println!("{:?}", visited);
-    let ntot = visited.len() as i32;
     (visited, ntot)
 }
 
@@ -76,20 +31,18 @@ enum Trip {
     Loops,
 }
 
-const DELTA_XY: [(i32, i32); 4] = [(0, -1), (1, 0), (0, 1), (-1, 0)]; // must start with UP
-
-fn find_path(map: Map, starting_pos: Pos) -> Trip {
+fn find_path(map: &Map, starting_pos: &Pos) -> (Trip, HashSet<(Direction, i32, i32)>) {
     let mut visited: HashSet<(Direction, i32, i32)> = HashSet::new();
     let mut direction = Direction::Up;
     let xdim = map[0].len() as i32;
     let ydim = map.len() as i32;
 
-    let mut pos = starting_pos;
+    let mut pos = *starting_pos;
 
-    loop {
+    let trip = loop {
         visited.insert((direction, pos.0, pos.1));
 
-        let mut next = match direction {
+        let next = match direction {
             Direction::Up => (pos.0, pos.1 - 1) as Pos,
             Direction::Down => (pos.0, pos.1 + 1) as Pos,
             Direction::Left => (pos.0 - 1, pos.1) as Pos,
@@ -100,8 +53,6 @@ fn find_path(map: Map, starting_pos: Pos) -> Trip {
             break Trip::Exits;
         }
 
-        // println!("{}", map[next.1 as usize][next.0 as usize]);
-        // println!("{:?} {} {}", map, next.1, next.0);
         if map[next.1 as usize][next.0 as usize] {
             direction = match direction {
                 Direction::Up => Direction::Right,
@@ -110,67 +61,32 @@ fn find_path(map: Map, starting_pos: Pos) -> Trip {
                 Direction::Right => Direction::Down,
             };
             continue;
+            // need to continue here, because we need to check it for collisions
         }
-        /* XXX: not working :(
-                (direction, next) = if map[next.1 as usize][next.0 as usize] {
-                    match direction {
-                        Direction::Up => (Direction::Right, (pos.0 + 1, pos.1) as Pos),
-                        Direction::Down => (Direction::Left, (pos.0 - 1, pos.1) as Pos),
-                        Direction::Left => (Direction::Up, (pos.0, pos.1 - 1) as Pos),
-                        Direction::Right => (Direction::Down, (pos.0, pos.1 + 1) as Pos),
-                    }
-                } else {
-                    (direction, next)
-                };
-        */
 
         if visited.contains(&(direction, next.0, next.1)) {
-            return Trip::Loops;
+            return (Trip::Loops, visited);
         }
 
         pos = next;
-    }
+    };
+
+    (trip, visited)
 }
 
-fn sim_guard(map: Map, starting_pos: Pos) -> Trip {
-    let max_y = map.len() as i32;
-    let max_x = map[0].len() as i32;
-    let mut x = starting_pos.0;
-    let mut y = starting_pos.1;
-    let mut dir = 0; // UP
-    let mut visited_pos = HashSet::new();
-    let mut visited_pos_dir = HashSet::new();
-
-    'outer: loop {
-        visited_pos.insert((x, y));
-        visited_pos_dir.insert((x, y, dir));
-        let (dx, dy) = DELTA_XY[dir];
-        let x1 = x + dx;
-        let y1 = y + dy;
-        if y1 < 0 || y1 >= max_y || x1 < 0 || x1 >= max_x {
-            break 'outer;
-        }
-        if map[y1 as usize][x1 as usize] {
-            dir = (dir + 1) % 4;
-            continue;
-        }
-        x = x1;
-        y = y1;
-        if visited_pos_dir.contains(&(x, y, dir)) {
-            return Trip::Loops;
-        }
+fn print_map(map: &Map, starting_pos: &Pos, visited: &HashSet<(Direction, i32, i32)>) {
+    let mut wo_dir = HashSet::new();
+    for &v in visited {
+        wo_dir.insert((v.1, v.2));
     }
-    return Trip::Exits;
-}
 
-fn print_map(map: &Map, starting_pos: &Pos, visited: &HashMap<(i32, i32), i32>) {
     for (y, line) in map.iter().enumerate() {
         for (x, element) in line.iter().enumerate() {
             let symbol = if *starting_pos == (x as i32, y as i32) {
                 '^'
             } else if *element {
                 '#'
-            } else if visited.get(&(x as i32, y as i32)).is_some() {
+            } else if wo_dir.get(&(x as i32, y as i32)).is_some() {
                 'X'
             } else {
                 '.'
@@ -181,22 +97,22 @@ fn print_map(map: &Map, starting_pos: &Pos, visited: &HashMap<(i32, i32), i32>) 
     }
 }
 
-fn part2(map: &Map, starting_pos: &Pos, visited: &HashMap<(i32, i32), i32>) -> i32 {
-    let ntot = visited.len();
-    let mut nit = 0;
-
+fn part2(map: &Map, starting_pos: &Pos, visited: &HashSet<(Direction, i32, i32)>) -> i32 {
     let mut loops = 0;
+    let mut wo_dir = HashSet::new();
+    for v in visited.iter() {
+        wo_dir.insert((v.1, v.2));
+    }
+    wo_dir.remove(starting_pos);
     // brute forcing it the stupid way (and apparently wrong)
-    for (k, _) in visited {
+    for (x, y) in &wo_dir {
         let mut blocked = map.clone();
-        blocked[k.1 as usize][k.0 as usize] = true;
+        blocked[*y as usize][*x as usize] = true;
         // match sim_guard(blocked, *starting_pos) {
-        match find_path(blocked, *starting_pos) {
+        match find_path(&blocked, starting_pos).0 {
             Trip::Loops => loops += 1,
             Trip::Exits => (),
         }
-        nit += 1;
-        println!("{} {} || {}/{}", k.0, k.1, nit, ntot);
     }
 
     loops
