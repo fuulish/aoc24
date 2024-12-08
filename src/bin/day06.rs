@@ -39,7 +39,7 @@ fn find_path(map: &Map, starting_pos: &Pos) -> (Trip, HashSet<(Direction, i32, i
 
     let mut pos = *starting_pos;
 
-    let trip = loop {
+    loop {
         visited.insert((direction, pos.0, pos.1));
 
         let next = match direction {
@@ -50,7 +50,7 @@ fn find_path(map: &Map, starting_pos: &Pos) -> (Trip, HashSet<(Direction, i32, i
         };
 
         if next.0 < 0 || next.0 >= xdim || next.1 < 0 || next.1 >= ydim {
-            break Trip::Exits;
+            break (Trip::Exits, visited);
         }
 
         if map[next.1 as usize][next.0 as usize] {
@@ -65,13 +65,11 @@ fn find_path(map: &Map, starting_pos: &Pos) -> (Trip, HashSet<(Direction, i32, i
         }
 
         if visited.contains(&(direction, next.0, next.1)) {
-            return (Trip::Loops, visited);
+            break (Trip::Loops, visited);
         }
 
         pos = next;
-    };
-
-    (trip, visited)
+    }
 }
 
 fn print_map(map: &Map, starting_pos: &Pos, visited: &HashSet<(Direction, i32, i32)>) {
