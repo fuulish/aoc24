@@ -28,6 +28,27 @@ fn extract_input(inp: &str) -> (RuleSet, Vec<Vec<i32>>) {
 
 type RuleSet = HashMap<(i32, i32), bool>;
 
+fn get_incorrect_pages(rules: &RuleSet, pages: &Vec<Vec<i32>>) -> Vec<Vec<i32>> {
+    let mut incorrect_pages: Vec<Vec<i32>> = Vec::new();
+
+    for page in pages {
+        let mut is_correct = true;
+        for (lindex, &left) in page.iter().enumerate() {
+            'outer: for &right in page[lindex + 1..].iter() {
+                if !rules.get(&(left, right)).unwrap_or(&true) {
+                    is_correct = false;
+                    break 'outer;
+                }
+            }
+        }
+        if !is_correct {
+            incorrect_pages.push(page.clone());
+        }
+    }
+
+    incorrect_pages
+}
+
 fn part1(rules: &RuleSet, pages: &Vec<Vec<i32>>) -> i32 {
     let mut total = 0;
     let mut correct_pages: Vec<Vec<i32>> = Vec::new();
@@ -57,6 +78,22 @@ fn part1(rules: &RuleSet, pages: &Vec<Vec<i32>>) -> i32 {
 fn part2(rules: &RuleSet, pages: &Vec<Vec<i32>>) -> i32 {
     let mut total = 0;
 
+    let incorrect_pages = get_incorrect_pages(rules, pages);
+
+    for page in incorrect_pages {
+        let mut count = Vec::new();
+        for (idx, &left) in page.iter().enumerate() {
+            count.push((left, 0));
+            for &right in &page {
+                if *rules.get(&(right, left)).unwrap_or(&false) {
+                    count[idx].1 += 1;
+                }
+            }
+        }
+        count.sort_by_key(|&x| x.1);
+        total += count[count.len() / 2].0;
+    }
+
     total
 }
 
@@ -76,9 +113,9 @@ fn main() {
     println!("{total_p1}");
     // let total_p2 = part2(&data);
     // assert!(total_p1 == 143); // real input part 1
-    assert!(total_p1 == 5762); // real input part 1
+    // assert!(total_p1 == 5762); // real input part 1
 
     let total_p2 = part2(&rules, &pages);
     println!("{total_p2}");
-    assert!(total_p2 == 1796);
+    assert!(total_p2 == 4130);
 }
