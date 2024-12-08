@@ -28,8 +28,13 @@ fn extract_input(inp: &str) -> (RuleSet, Vec<Vec<i32>>) {
 
 type RuleSet = HashMap<(i32, i32), bool>;
 
-fn get_incorrect_pages(rules: &RuleSet, pages: &Vec<Vec<i32>>) -> Vec<Vec<i32>> {
-    let mut incorrect_pages: Vec<Vec<i32>> = Vec::new();
+enum PageType {
+    Correct,
+    Incorrect,
+}
+
+fn get_pages(rules: &RuleSet, pages: &Vec<Vec<i32>>, correctness: PageType) -> Vec<Vec<i32>> {
+    let mut output: Vec<Vec<i32>> = Vec::new();
 
     for page in pages {
         let mut is_correct = true;
@@ -41,32 +46,32 @@ fn get_incorrect_pages(rules: &RuleSet, pages: &Vec<Vec<i32>>) -> Vec<Vec<i32>> 
                 }
             }
         }
-        if !is_correct {
-            incorrect_pages.push(page.clone());
-        }
+
+        output.push(match correctness {
+            PageType::Correct => {
+                if is_correct {
+                    page.clone()
+                } else {
+                    continue;
+                }
+            }
+            PageType::Incorrect => {
+                if !is_correct {
+                    page.clone()
+                } else {
+                    continue;
+                }
+            }
+        })
     }
 
-    incorrect_pages
+    output
 }
 
 fn part1(rules: &RuleSet, pages: &Vec<Vec<i32>>) -> i32 {
     let mut total = 0;
-    let mut correct_pages: Vec<Vec<i32>> = Vec::new();
 
-    for page in pages {
-        let mut is_correct = true;
-        for (lindex, &left) in page.iter().enumerate() {
-            'outer: for &right in page[lindex + 1..].iter() {
-                if !rules.get(&(left, right)).unwrap_or(&true) {
-                    is_correct = false;
-                    break 'outer;
-                }
-            }
-        }
-        if is_correct {
-            correct_pages.push(page.clone());
-        }
-    }
+    let correct_pages = get_pages(rules, pages, PageType::Correct);
 
     for page in correct_pages {
         total += page[page.len() / 2];
@@ -78,7 +83,7 @@ fn part1(rules: &RuleSet, pages: &Vec<Vec<i32>>) -> i32 {
 fn part2(rules: &RuleSet, pages: &Vec<Vec<i32>>) -> i32 {
     let mut total = 0;
 
-    let incorrect_pages = get_incorrect_pages(rules, pages);
+    let incorrect_pages = get_pages(rules, pages, PageType::Incorrect);
 
     for page in incorrect_pages {
         let mut count = Vec::new();
