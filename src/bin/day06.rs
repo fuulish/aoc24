@@ -102,16 +102,27 @@ fn find_path(map: Map, starting_pos: Pos) -> Trip {
 
         // println!("{}", map[next.1 as usize][next.0 as usize]);
         // println!("{:?} {} {}", map, next.1, next.0);
-        (direction, next) = if map[next.1 as usize][next.0 as usize] {
-            match direction {
-                Direction::Up => (Direction::Right, (pos.0 + 1, pos.1) as Pos),
-                Direction::Down => (Direction::Left, (pos.0 - 1, pos.1) as Pos),
-                Direction::Left => (Direction::Up, (pos.0, pos.1 - 1) as Pos),
-                Direction::Right => (Direction::Down, (pos.0, pos.1 + 1) as Pos),
-            }
-        } else {
-            (direction, next)
-        };
+        if map[next.1 as usize][next.0 as usize] {
+            direction = match direction {
+                Direction::Up => Direction::Right,
+                Direction::Down => Direction::Left,
+                Direction::Left => Direction::Up,
+                Direction::Right => Direction::Down,
+            };
+            continue;
+        }
+        /* XXX: not working :(
+                (direction, next) = if map[next.1 as usize][next.0 as usize] {
+                    match direction {
+                        Direction::Up => (Direction::Right, (pos.0 + 1, pos.1) as Pos),
+                        Direction::Down => (Direction::Left, (pos.0 - 1, pos.1) as Pos),
+                        Direction::Left => (Direction::Up, (pos.0, pos.1 - 1) as Pos),
+                        Direction::Right => (Direction::Down, (pos.0, pos.1 + 1) as Pos),
+                    }
+                } else {
+                    (direction, next)
+                };
+        */
 
         if visited.contains(&(direction, next.0, next.1)) {
             return Trip::Loops;
