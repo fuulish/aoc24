@@ -111,7 +111,13 @@ fn part2_alt(rules: &RuleSet, pages: &Vec<Vec<i32>>) -> i32 {
 
     for page in incorrect_pages {
         let mut sorted = page.clone();
-        sorted.sort_by(|a, b| *rules.get(&(*a, *b)).unwrap_or(&Ordering::Less));
+        sorted.sort_by(|a, b| match rules.get(&(*a, *b)) {
+            Some(&v) => v,
+            None => {
+                println!("rule missing"); // <- runtime says none is missing
+                Ordering::Less
+            }
+        });
         total += sorted[sorted.len() / 2];
     }
 
