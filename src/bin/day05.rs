@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use std::{collections::HashMap, fs};
 
 fn extract_input(inp: &str) -> (RuleSet, Vec<Vec<i32>>) {
@@ -103,6 +104,26 @@ fn part2(rules: &RuleSet, pages: &Vec<Vec<i32>>) -> i32 {
     total
 }
 
+fn part2_alt(rules: &RuleSet, pages: &Vec<Vec<i32>>) -> i32 {
+    let mut total = 0;
+
+    let incorrect_pages = get_pages(rules, pages, PageType::Incorrect);
+
+    for page in incorrect_pages {
+        let mut sorted = page.clone();
+        sorted.sort_by(|a, b| {
+            if *rules.get(&(*a, *b)).unwrap_or(&true) {
+                Ordering::Less
+            } else {
+                Ordering::Greater
+            }
+        });
+        total += sorted[sorted.len() / 2];
+    }
+
+    total
+}
+
 fn main() {
     println!("Day 5");
     let mut args = std::env::args();
@@ -122,6 +143,8 @@ fn main() {
     // assert!(total_p1 == 5762); // real input part 1
 
     let total_p2 = part2(&rules, &pages);
+    let total_p2_alt = part2_alt(&rules, &pages);
     println!("{total_p2}");
+    assert!(total_p2 == total_p2_alt);
     assert!(total_p2 == 4130);
 }
