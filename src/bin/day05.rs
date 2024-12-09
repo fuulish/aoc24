@@ -109,10 +109,9 @@ fn part2_alt(rules: &RuleSet, pages: &Vec<Vec<i32>>) -> i32 {
 
     let incorrect_pages = get_pages(rules, pages, PageType::Incorrect);
 
-    for page in incorrect_pages {
-        let mut sorted = page.clone();
-        sorted.sort_by(|a, b| *rules.get(&(*a, *b)).unwrap_or(&Ordering::Less));
-        total += sorted[sorted.len() / 2];
+    for mut page in incorrect_pages {
+        page.sort_by(|a, b| *rules.get(&(*a, *b)).unwrap_or(&Ordering::Less));
+        total += page[page.len() / 2];
     }
 
     total
