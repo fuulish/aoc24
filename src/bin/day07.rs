@@ -1,6 +1,6 @@
 use std::fs;
 
-const TEST_SOLUTION_PART1: i32 = 41;
+const TEST_SOLUTION_PART1: i32 = 3749;
 const TEST_SOLUTION_PART2: i32 = 0;
 
 const KNOWN_SOLUTION_PART1: i32 = 41;
