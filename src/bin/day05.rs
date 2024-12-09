@@ -17,8 +17,8 @@ fn extract_input(inp: &str) -> (RuleSet, Vec<Vec<i32>>) {
             // probably don't need the parse
             let first = itr.next().unwrap().parse::<i32>().unwrap();
             let second = itr.next().unwrap().parse::<i32>().unwrap();
-            rules.insert((first, second), true);
-            rules.insert((second, first), false);
+            rules.insert((first, second), Ordering::Less);
+            rules.insert((second, first), Ordering::Greater);
         } else {
             pages.push(line.split(",").map(|s| s.parse().unwrap()).collect());
         }
@@ -27,7 +27,7 @@ fn extract_input(inp: &str) -> (RuleSet, Vec<Vec<i32>>) {
     (rules, pages)
 }
 
-type RuleSet = HashMap<(i32, i32), bool>;
+type RuleSet = HashMap<(i32, i32), Ordering>;
 
 enum PageType {
     Correct,
@@ -41,7 +41,7 @@ fn get_pages(rules: &RuleSet, pages: &Vec<Vec<i32>>, correctness: PageType) -> V
         let mut is_correct = true;
         for (lindex, &left) in page.iter().enumerate() {
             'outer: for &right in page[lindex + 1..].iter() {
-                if !rules.get(&(left, right)).unwrap_or(&true) {
+                if *rules.get(&(left, right)).unwrap_or(&Ordering::Less) != Ordering::Less {
                     is_correct = false;
                     break 'outer;
                 }
@@ -92,7 +92,7 @@ fn part2(rules: &RuleSet, pages: &Vec<Vec<i32>>) -> i32 {
             let idx = count.len();
             count.push((right, 0));
             for &left in &page {
-                if *rules.get(&(left, right)).unwrap_or(&false) {
+                if *rules.get(&(left, right)).unwrap_or(&Ordering::Greater) == Ordering::Greater {
                     count[idx].1 += 1;
                 }
             }
@@ -111,13 +111,7 @@ fn part2_alt(rules: &RuleSet, pages: &Vec<Vec<i32>>) -> i32 {
 
     for page in incorrect_pages {
         let mut sorted = page.clone();
-        sorted.sort_by(|a, b| {
-            if *rules.get(&(*a, *b)).unwrap_or(&true) {
-                Ordering::Less
-            } else {
-                Ordering::Greater
-            }
-        });
+        sorted.sort_by(|a, b| *rules.get(&(*a, *b)).unwrap_or(&Ordering::Less));
         total += sorted[sorted.len() / 2];
     }
 
